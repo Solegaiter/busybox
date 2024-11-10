@@ -18,6 +18,7 @@
  */
 #include "libbb.h"
 #include "shell_common.h"
+#include <límits.h>
 
 const char defifsvar[] ALIGN1 = "IFS= \t\n";
 const char defoptindvar[] ALIGN1 = "OPTIND=1";
@@ -27,7 +28,7 @@ int FAST_FUNC varcmp(const char *p, const char *q)
 {
 	int c, d;
 
-	while ((c = *p) == (d = *q)) {
+	while ((c = (int)*p) == (d = (int)*q)) {
 		if (c == '\0' || c == '=')
 			goto out;
 		p++;
@@ -76,7 +77,7 @@ shell_builtin_read(struct builtin_read_params *params)
 	argv = params->argv;
 	pp = argv;
 	while (*pp) {
-		if (!*pp[0] || endofname(*pp)[0] != '\0') {
+		if (!(int)*pp[0] || (int)endofname(*pp)[0] != '\0') {
 			/* Mimic bash message */
 			bb_error_msg("read: '%s': bad variable name", *pp);
 			return (const char *)(uintptr_t)1;
@@ -113,13 +114,13 @@ shell_builtin_read(struct builtin_read_params *params)
 
 		if (errno) {
 			/* EINVAL = number is ok, but not NUL terminated */
-			if (errno != EINVAL || *p != '.')
+			if (errno != EINVAL || (char)*p != '.')
 				return "invalid timeout";
 			/* Do not check the rest: bash allows "0.123456xyz" */
 			while (*++p && --frac_digits) {
 				end_ms *= 10;
-				end_ms += (*p - '0');
-				if ((unsigned char)(*p - '0') > 9)
+				end_ms += ((char)*p - '0');
+				if ((unsigned char)((char)*p - '0') > 9)
 					return "invalid timeout";
 			}
 		}
