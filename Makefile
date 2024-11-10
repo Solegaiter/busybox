@@ -316,12 +316,12 @@ AFLAGS_KERNEL	=
 
 # Use LINUXINCLUDE when you must reference the include/ directory.
 # Needed to be compatible with the O= option
-CFLAGS		:= $(CFLAGS) -std=c23 -Werror -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes
+CFLAGS		:= $(CFLAGS)
 # Added only to final link stage of busybox binary
 
-CFLAGS_busybox	:= $(CFLAGS_busybox) -std=c23 -Werror -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes
+CFLAGS_busybox	:= $(CFLAGS_busybox)
 
-CPPFLAGS	:= $(CPPFLAGS) -std=c++23 -Werror -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -Wshadow -Wstrict-prototypes -Wold-style-definition -Wmissing-prototypes
+CPPFLAGS	:= $(CPPFLAGS)
 AFLAGS		:= $(AFLAGS)
 LDFLAGS		:= $(LDFLAGS)
 LDLIBS		:=
