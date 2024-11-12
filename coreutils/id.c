@@ -238,7 +238,7 @@ int id_main(int argc UNUSED_PARAM, char **argv)
 			free(groups);
 #if ENABLE_SELINUX
 		if (is_selinux_enabled()) {
-			if (!(getcon(&scontext) < 0 || scontext == nullptr))
+			if (getcon(&scontext) == 0 && scontext != nullptr)
 				printf(" context=%s", scontext);
 		}
 #endif
