@@ -17,7 +17,7 @@
 # if defined(__GNUC__) && (defined(__i386__) || defined(__x86_64__))
 static void cpuid_eax_ebx_ecx(unsigned *eax, unsigned *ebx, unsigned *ecx, unsigned *edx)
 {
-	asm ("cpuid"
+	__asm__ ("cpuid"
 		: "=a"(*eax), "=b"(*ebx), "=c"(*ecx), "=d"(*edx)
 		: "0" (*eax), "1" (*ebx), "2" (*ecx)
 	);

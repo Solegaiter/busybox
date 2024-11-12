@@ -6094,7 +6094,7 @@ static char *expand_string_to_string(const char *str, int EXP_flags, int do_unba
 #if ENABLE_HUSH_TICK
 static int process_command_subs(o_string *dest, const char *s);
 #endif
-static int expand_vars_to_list(o_string *output, int n, char *arg);
+static int expand_vars_to_list(o_string *output, int n, const char *arg);
 
 /* expand_strvec_to_strvec() takes a list of strings, expands
  * all variable references within and returns a pointer to
@@ -6380,7 +6380,7 @@ static char *encode_then_expand_vararg(const char *str, int handle_squotes, int 
 /* Expanding ARG in ${var+ARG}, ${var-ARG}
  */
 static NOINLINE int encode_then_append_var_plusminus(o_string *output, int n,
-		char *str, int dquoted)
+		const char *str, int dquoted)
 {
 	struct in_str input;
 	o_string dest = NULL_O_STRING;
@@ -6639,7 +6639,7 @@ static NOINLINE int expand_one_var(o_string *output, int n,
 	char exp_op;
 	char exp_save = exp_save; /* for compiler */
 	char *exp_saveptr; /* points to expansion operator */
-	char *exp_word = exp_word; /* for compiler */
+	const char *exp_word = ""; /* for compiler */
 	char arg0;
 
 	val = NULL;
@@ -7029,7 +7029,7 @@ static NOINLINE int expand_one_var(o_string *output, int n,
  * to be filled). This routine is extremely tricky: has to deal with
  * variables/parameters with whitespace, $* and $@, and constructs like
  * 'echo -$*-'. If you play here, you must run testsuite afterwards! */
-static NOINLINE int expand_vars_to_list(o_string *output, int n, char *arg)
+static NOINLINE int expand_vars_to_list(o_string *output, int n, const char *arg)
 {
 	/* output->o_expflags & EXP_FLAG_SINGLEWORD (0x80) if we are in
 	 * expansion of right-hand side of assignment == 1-element expand.
@@ -7179,7 +7179,7 @@ static NOINLINE int expand_vars_to_list(o_string *output, int n, char *arg)
 #endif
 		default:
 			/* <SPECIAL_VAR_SYMBOL>varname[ops]<SPECIAL_VAR_SYMBOL> */
-			n = expand_one_var(output, n, first_ch, arg, &p);
+			n = expand_one_var(output, n, first_ch, (char *) arg, &p);
 			break;
 		} /* switch (char after <SPECIAL_VAR_SYMBOL>) */
 

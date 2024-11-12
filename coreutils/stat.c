@@ -258,7 +258,7 @@ static void printfs(char *pformat, const char *msg)
 /* print statfs info */
 static void FAST_FUNC print_statfs(char *pformat, const char m,
 		const char *const filename, const void *data
-		IF_SELINUX(, security_context_t scontext))
+		IF_SELINUX(, char* scontext))
 {
 	const struct statfs *statfsbuf = data;
 	if (m == 'n') {
@@ -306,7 +306,7 @@ static void FAST_FUNC print_statfs(char *pformat, const char m,
 /* print stat info */
 static void FAST_FUNC print_stat(char *pformat, const char m,
 		const char *const filename, const void *data
-		IF_SELINUX(, security_context_t scontext))
+		IF_SELINUX(, char* scontext))
 {
 #define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
 	struct stat *statbuf = (struct stat *) data;
@@ -408,9 +408,9 @@ static void FAST_FUNC print_stat(char *pformat, const char m,
 
 static void print_it(const char *masterformat,
 		const char *filename,
-		void FAST_FUNC (*print_func)(char*, char, const char*, const void* IF_SELINUX(, security_context_t scontext)),
+		void FAST_FUNC (*print_func)(char*, char, const char*, const void* IF_SELINUX(, char* scontext)),
 		const void *data
-		IF_SELINUX(, security_context_t scontext))
+		IF_SELINUX(, char* scontext))
 {
 	/* Create a working copy of the format string */
 	char *format = xstrdup(masterformat);
@@ -475,7 +475,7 @@ static bool do_statfs(const char *filename, const char *format)
 	const char *format;
 #endif
 #if ENABLE_SELINUX
-	security_context_t scontext = NULL;
+	char* scontext = NULL;
 
 	if (option_mask32 & OPT_SELINUX) {
 		if ((option_mask32 & OPT_DEREFERENCE
@@ -590,7 +590,7 @@ static bool do_stat(const char *filename, const char *format)
 {
 	struct stat statbuf;
 #if ENABLE_SELINUX
-	security_context_t scontext = NULL;
+	char* scontext = NULL;
 
 	if (option_mask32 & OPT_SELINUX) {
 		if ((option_mask32 & OPT_DEREFERENCE

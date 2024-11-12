@@ -40,6 +40,7 @@
 
 #include "libbb.h"
 #include "libcoreutils/coreutils.h"
+#include <selinux/label.h>
 
 #if ENABLE_FEATURE_INSTALL_LONG_OPTIONS
 static const char install_longopts[] ALIGN1 =
@@ -73,7 +74,8 @@ static const char install_longopts[] ALIGN1 =
 static void setdefaultfilecon(const char *path)
 {
 	struct stat s;
-	security_context_t scontext = NULL;
+	char *scontext = NULL;
+	struct selabel_handle *sehandle;
 
 	if (!is_selinux_enabled()) {
 		return;
@@ -82,12 +84,23 @@ static void setdefaultfilecon(const char *path)
 		return;
 	}
 
-	if (matchpathcon(path, s.st_mode, &scontext) < 0) {
-		goto out;
+	sehandle = selabel_open(SELABEL_CTX_FILE, NULL, 0);
+
+	if (!sehandle) {
+		perror("failed");
+		return;
 	}
-	if (strcmp(scontext, "<<none>>") == 0) {
-		goto out;
-	}
+
+    if (selabel_lookup(sehandle, &scontext, path, s.st_mode) < 0) {
+        selabel_close(sehandle);
+        return;
+    }
+
+    if (strcmp(scontext, "<<none>>") == 0) {
+        selabel_close(sehandle);
+        freecon(scontext);
+        return;
+    }
 
 	if (lsetfilecon(path, scontext) < 0) {
 		if (errno != ENOTSUP) {
@@ -96,7 +109,7 @@ static void setdefaultfilecon(const char *path)
 		}
 	}
 
- out:
+	selabel_close(sehandle);
 	freecon(scontext);
 }
 
@@ -119,7 +132,7 @@ int install_main(int argc, char **argv)
 	int ret = EXIT_SUCCESS;
 	int isdir;
 #if ENABLE_SELINUX
-	security_context_t scontext;
+	char *scontext;
 	bool use_default_selinux_context = 1;
 #endif
 	enum {

@@ -7147,8 +7147,8 @@ static void bc_vm_envArgs(void)
 	if (sizeof(int) == sizeof(char*)) {
 		bc_vec_push(&v, &const_int_0);
 	} else {
-		static char *const nullptr = NULL;
-		bc_vec_push(&v, &nullptr);
+		static char *const null = NULL;
+		bc_vec_push(&v, &null);
 	}
 	bc_args(((char **)v.v) - 1);
 

@@ -92,29 +92,30 @@ int FAST_FUNC string_to_llist(char *string, llist_t **llist, const char *delim)
 	return len;
 }
 
+
 char* FAST_FUNC filename2modname(const char *filename, char *modname)
 {
-	char local_modname[MODULE_NAME_LEN];
-	int i;
-	const char *from;
+    int i;
+    const char *from;
 
-	if (filename == NULL)
-		return NULL;
-	if (modname == NULL)
-		modname = local_modname;
-	// Disabled since otherwise "modprobe dir/name" would work
-	// as if it is "modprobe name". It is unclear why
-	// 'basenamization' was here in the first place.
-	//from = bb_get_last_path_component_nostrip(filename);
-	from = filename;
-	for (i = 0; i < (MODULE_NAME_LEN-1) && from[i] != '\0' && from[i] != '.'; i++)
-		modname[i] = (from[i] == '-') ? '_' : from[i];
-	modname[i] = '\0';
+    if (filename == NULL)
+        return NULL;
 
-	if (modname == local_modname)
-		return xstrdup(modname);
+    if (modname == NULL) {
+        modname = malloc(MODULE_NAME_LEN);
+        if (modname == NULL) {
+            perror("malloc failed");
+            return NULL;
+        }
+    }
 
-	return modname;
+    from = filename;
+    for (i = 0; i < (MODULE_NAME_LEN - 1) && from[i] != '\0' && from[i] != '.'; i++) {
+        modname[i] = (from[i] == '-') ? '_' : from[i];
+    }
+    modname[i] = '\0';
+
+    return modname;
 }
 
 #if ENABLE_FEATURE_CMDLINE_MODULE_OPTIONS

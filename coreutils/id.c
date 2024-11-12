@@ -156,7 +156,7 @@ int id_main(int argc UNUSED_PARAM, char **argv)
 	const char *prefix;
 	const char *username;
 #if ENABLE_SELINUX
-	security_context_t scontext = NULL;
+	char *scontext = NULL;
 #endif
 
 	if (ENABLE_GROUPS && (!ENABLE_ID || applet_name[0] == 'g')) {
@@ -238,7 +238,7 @@ int id_main(int argc UNUSED_PARAM, char **argv)
 			free(groups);
 #if ENABLE_SELINUX
 		if (is_selinux_enabled()) {
-			if (getcon(&scontext) == 0)
+			if (!(getcon(&scontext) < 0 || scontext == nullptr))
 				printf(" context=%s", scontext);
 		}
 #endif

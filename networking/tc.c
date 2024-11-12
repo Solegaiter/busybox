@@ -45,6 +45,7 @@
 #include "libbb.h"
 #include "common_bufsiz.h"
 
+#include <limits.h>
 #include "libiproute/utils.h"
 #include "libiproute/ip_common.h"
 #include "libiproute/rt_names.h"

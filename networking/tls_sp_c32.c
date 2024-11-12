@@ -257,7 +257,7 @@ static int sp_256_add_8(sp_digit* r, const sp_digit* a, const sp_digit* b)
 	return reg;
 #elif ALLOW_ASM && defined(__GNUC__) && defined(__x86_64__)
 	uint64_t reg;
-	asm volatile (
+	__asm__ volatile (
 "\n		movq	(%0), %3"
 "\n		addq	(%1), %3"
 "\n		movq	%3, (%2)"
@@ -353,7 +353,7 @@ static int sp_256_sub_8(sp_digit* r, const sp_digit* a, const sp_digit* b)
 	return reg;
 #elif ALLOW_ASM && defined(__GNUC__) && defined(__x86_64__)
 	uint64_t reg;
-	asm volatile (
+	__asm__ volatile (
 "\n		movq	(%0), %3"
 "\n		subq	(%1), %3"
 "\n		movq	%3, (%2)"
@@ -448,7 +448,7 @@ static void sp_256_sub_8_p256_mod(sp_digit* r)
 # else // let's do it by hand:
 	uint64_t reg;
 	uint64_t rax;
-	asm volatile (
+	__asm__ volatile (
 "\n		orl	$0xffffffff, %%eax" // %1 (rax) = 00000000ffffffff
 "\n		subq	$0xffffffffffffffff, (%0)"
 "\n		sbbq	%1, 1*8(%0)"
@@ -527,8 +527,8 @@ static void sp_256to512_mul_8(sp_digit* r, const sp_digit* a, const sp_digit* b)
 	const uint64_t* bb = (const void*)b;
 	uint64_t* rr = (void*)r;
 	int k;
-	register uint64_t accl asm("r8");
-	register uint64_t acch asm("r9");
+	register uint64_t accl __asm__("r8");
+	register uint64_t acch __asm__("r9");
 	/* ^^^ ask gcc to not use rax/rdx/input arg regs for accumulator variables */
 	/* (or else it may generate lots of silly mov's and even xchg's!) */
 
@@ -537,7 +537,7 @@ static void sp_256to512_mul_8(sp_digit* r, const sp_digit* a, const sp_digit* b)
 		unsigned i, j;
 		/* ^^^^^ not signed "int",
 		 * or gcc can use a temp register to sign-extend i,j for aa[i],bb[j] */
-		register uint64_t acc_hi asm("r10");
+		register uint64_t acc_hi __asm__("r10");
 		/* ^^^ ask gcc to not use rax/rdx/input arg regs for accumulators */
 		i = k - 3;
 		if ((int)i < 0)
@@ -549,7 +549,7 @@ static void sp_256to512_mul_8(sp_digit* r, const sp_digit* a, const sp_digit* b)
 //			uint128_t m = ((uint128_t)a[i]) * b[j];
 //			acc_hi:acch:accl += m;
 			long rax_clobbered;
-			asm volatile (
+			__asm__ volatile (
 			// aa[i] is already loaded in %%rax
 "\n			mulq	%8"
 "\n			addq	%%rax, %0"
